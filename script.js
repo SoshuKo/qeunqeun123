@@ -26,6 +26,7 @@ let freCooldownTurns = 2; // Freが選べるターン数（連続したターン
 // ルール表示の切り替え
 function toggleRules() {
     isRulesVisible = !isRulesVisible;
+    // ルールを表示または非表示にする
     document.getElementById('rules-container').style.display = isRulesVisible ? 'block' : 'none';
 }
 
