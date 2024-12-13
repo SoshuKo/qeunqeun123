@@ -32,14 +32,17 @@ function toggleRules() {
 
 // 初回ターンの時、CPUはKiúnを選ばない
 function getRandomChoice(exclude) {
-    let choices = roles.filter(role => role !== exclude);
-
-    // 123ルールに基づきFreを選べる状態であれば、Freを選択肢に加える
-    if (canFreBeSelected) {
-        choices.push('Fre');
+    if (isFirstTurn) {
+        let choices = roles.filter(role => role !== exclude && role !== 'Kiún');
+        return choices[Math.floor(Math.random() * choices.length)];
+    } else {
+        let choices = roles.filter(role => role !== exclude);
+        // Freが選べる状態ならFreも選択肢に含める
+        if (canFreBeSelected) {
+            choices.push('Fre');
+        }
+        return choices[Math.floor(Math.random() * choices.length)];
     }
-
-    return choices[Math.floor(Math.random() * choices.length)];
 }
 
 function playSound(role) {
@@ -75,7 +78,7 @@ function updateTurnInfo() {
 }
 
 function endGame(message) {
-    document.getElementById('center-info').innerHTML += `<p>${message}</p>`;
+    document.getElementById('center-info').innerHTML += <p>${message}</p>;
     document.getElementById('choices').innerHTML = '<button onclick="location.reload()">もう一度遊ぶ</button>';
 }
 
