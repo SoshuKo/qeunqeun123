@@ -23,9 +23,6 @@ let canFreBeSelected = false; // Freが選べる状態かどうか
 let lastFreTurn = -1; // 最後にFreを選んだターンを記録
 let freCooldownTurns = 2; // Freが選べるターン数（連続したターンで役を出した後）
 
-let playerLastTurnChoices = []; // プレイヤーの最後のターン選択を記録
-let cpuLastTurnChoices = []; // CPUの最後のターン選択を記録
-
 // ルール表示の切り替え
 function toggleRules() {
     isRulesVisible = !isRulesVisible;
@@ -35,7 +32,7 @@ function toggleRules() {
 // 初回ターンの時、CPUはKiúnを選ばない
 function getRandomChoice(exclude) {
     if (isFirstTurn) {
-        let choices = roles.filter(role => role !== exclude && role !== 'Kiún'); // 初回ターンでKiúnを選ばない
+        let choices = roles.filter(role => role !== exclude && role !== 'Kiún');
         return choices[Math.floor(Math.random() * choices.length)];
     } else {
         let choices = roles.filter(role => role !== exclude);
@@ -61,8 +58,8 @@ function updateNextOptions() {
 
     // Freが選べるターンかどうか
     if (canFreBeSelected) {
-        cpuOptions += ', Fre';  // Freが選べる場合、選択肢にFreを追加
-        playerOptions += ', Fre';  // Freが選べる場合、選択肢にFreを追加
+        cpuOptions += ', Fre';
+        playerOptions += ', Fre';
     }
 
     document.getElementById('cpu-options').innerText = cpuOptions;
@@ -81,23 +78,11 @@ function endGame(message) {
 }
 
 function checkFreEligibility() {
-    // プレイヤーとCPUのターンでFreが選べるかどうかを確認
-    if (playerLastTurnChoices.length >= 2) {
-        const playerSequence = playerLastTurnChoices.slice(-2);
-        if ((playerSequence[0] === 'Ye' && playerSequence[1] === 'Ch’e') || (playerSequence[0] === 'Ch’e' && playerSequence[1] === 'Nge')) {
-            canFreBeSelected = true;  // プレイヤーがFreを選べる条件
-        } else {
-            canFreBeSelected = false;
-        }
-    }
-
-    if (cpuLastTurnChoices.length >= 2) {
-        const cpuSequence = cpuLastTurnChoices.slice(-2);
-        if ((cpuSequence[0] === 'Ye' && cpuSequence[1] === 'Ch’e') || (cpuSequence[0] === 'Ch’e' && cpuSequence[1] === 'Nge')) {
-            canFreBeSelected = true;  // CPUがFreを選べる条件
-        } else {
-            canFreBeSelected = false;
-        }
+    // 連続してYe→Ch’eまたはCh’e→Ngeの順番で役を出すと次のターンでFreが選べる
+    if ((lastParentChoice === 'Ye' && lastChildChoice === 'Ch’e') || (lastParentChoice === 'Ch’e' && lastChildChoice === 'Nge')) {
+        canFreBeSelected = true;
+    } else {
+        canFreBeSelected = false;
     }
 }
 
@@ -137,12 +122,14 @@ function playTurn(childChoice) {
 
     // 勝敗判定
     let resultMessage = '';
+
     if (childChoice === 'Kiún' && parentChoice !== 'Kiún') {
         resultMessage = 'Kiúnが一致しなかったため、親の負け！';
     } else if (parentChoice === 'Kiún' && childChoice !== 'Kiún') {
         resultMessage = 'Kiúnが一致しなかったため、親の負け！';
     } else if (parentChoice === childChoice && childChoice === 'Kiún') {
         resultMessage = 'Kiúnが一致したためゲームは続行されます。';
+        // ゲーム続行の場合、ターン交代せず次のターンへ
         turnCounter++;
         updateRoleImages();
         playSound(childChoice); // 役の音声を再生
@@ -158,8 +145,24 @@ function playTurn(childChoice) {
         resultMessage = 'Fre同士の勝負では親が勝利します。';
     } else if (childChoice === 'Fre' && parentChoice !== 'Fre') {
         resultMessage = 'Freと他の役との勝負では引き分けです。ターンは続行されます。';
+        // ゲーム終了せずターン続行
+        turnCounter++;
+        isParentTurn = !isParentTurn; // 親と子を交代
+        updateRoleImages();
+        playSound(childChoice); // 役の音声を再生
+        updateNextOptions();
+        updateTurnInfo();
+        return;
     } else if (parentChoice === 'Fre' && childChoice !== 'Fre') {
         resultMessage = 'Freと他の役との勝負では引き分けです。ターンは続行されます。';
+        // ゲーム終了せずターン続行
+        turnCounter++;
+        isParentTurn = !isParentTurn; // 親と子を交代
+        updateRoleImages();
+        playSound(childChoice); // 役の音声を再生
+        updateNextOptions();
+        updateTurnInfo();
+        return;
     }
 
     // 勝敗が決した場合
@@ -177,13 +180,6 @@ function playTurn(childChoice) {
 
     // 123ルールのチェック
     checkFreEligibility();
-
-    // プレイヤーとCPUのターン選択を記録
-    if (isParentTurn) {
-        cpuLastTurnChoices.push(parentChoice);
-    } else {
-        playerLastTurnChoices.push(childChoice);
-    }
 
     // UIの更新
     updateRoleImages();
