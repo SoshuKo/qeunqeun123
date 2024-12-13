@@ -21,7 +21,7 @@ const soundFiles = {
 
 let canFreBeSelected = false; // Freが選べる状態かどうか
 let lastFreTurn = -1; // 最後にFreを選んだターンを記録
-let freCooldownTurns = 1; // Freが選べるターン数（連続したターンで役を出した後）
+let freCooldownTurns = 2; // Freが選べるターン数（連続したターンで役を出した後）
 
 // ルール表示の切り替え
 function toggleRules() {
@@ -33,13 +33,12 @@ function toggleRules() {
 // 初回ターンの時、CPUはKiúnを選ばない
 function getRandomChoice(exclude) {
     let choices = roles.filter(role => role !== exclude);
-    
-    // Freを選べるターンかどうか
+
+    // 123ルールに基づきFreを選べる状態であれば、Freを選択肢に加える
     if (canFreBeSelected) {
         choices.push('Fre');
     }
 
-    // 123ルールに従ってCPUが選択する
     return choices[Math.floor(Math.random() * choices.length)];
 }
 
