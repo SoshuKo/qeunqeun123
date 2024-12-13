@@ -23,6 +23,9 @@ let canFreBeSelected = false; // Freが選べる状態かどうか
 let lastFreTurn = -1; // 最後にFreを選んだターンを記録
 let freCooldownTurns = 2; // Freが選べるターン数（連続したターンで役を出した後）
 
+let playerLastTurnChoices = []; // プレイヤーの最後のターン選択を記録
+let cpuLastTurnChoices = []; // CPUの最後のターン選択を記録
+
 // ルール表示の切り替え
 function toggleRules() {
     isRulesVisible = !isRulesVisible;
@@ -78,11 +81,23 @@ function endGame(message) {
 }
 
 function checkFreEligibility() {
-    // 連続してYe→Ch’eまたはCh’e→Ngeの順番で役を出すと次のターンでFreが選べる
-    if ((lastParentChoice === 'Ye' && lastChildChoice === 'Ch’e') || (lastParentChoice === 'Ch’e' && lastChildChoice === 'Nge')) {
-        canFreBeSelected = true;
-    } else {
-        canFreBeSelected = false;
+    // プレイヤーとCPUのターンでFreが選べるかどうかを確認
+    if (playerLastTurnChoices.length >= 2) {
+        const playerSequence = playerLastTurnChoices.slice(-2);
+        if ((playerSequence[0] === 'Ye' && playerSequence[1] === 'Ch’e') || (playerSequence[0] === 'Ch’e' && playerSequence[1] === 'Nge')) {
+            canFreBeSelected = true;
+        } else {
+            canFreBeSelected = false;
+        }
+    }
+
+    if (cpuLastTurnChoices.length >= 2) {
+        const cpuSequence = cpuLastTurnChoices.slice(-2);
+        if ((cpuSequence[0] === 'Ye' && cpuSequence[1] === 'Ch’e') || (cpuSequence[0] === 'Ch’e' && cpuSequence[1] === 'Nge')) {
+            canFreBeSelected = true;
+        } else {
+            canFreBeSelected = false;
+        }
     }
 }
 
@@ -163,6 +178,13 @@ function playTurn(childChoice) {
 
     // 123ルールのチェック
     checkFreEligibility();
+
+    // プレイヤーとCPUのターン選択を記録
+    if (isParentTurn) {
+        cpuLastTurnChoices.push(parentChoice);
+    } else {
+        playerLastTurnChoices.push(childChoice);
+    }
 
     // UIの更新
     updateRoleImages();
