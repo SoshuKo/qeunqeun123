@@ -9,7 +9,7 @@
 <body>
     <div id="game-container">
         <div id="cpu-side">
-            <h2>CPU <span id="cpu-status">親</span></h2>
+            <h2>CPU <span id="cpu-status"></span></h2>
             <div id="cpu-role"><img id="cpu-role-img" src="" alt="CPUの役"></div>
             <p id="cpu-next-roles">次に出せる役: <span id="cpu-options"></span></p>
         </div>
@@ -19,12 +19,13 @@
             <p>現在のターン: <span id="turn-counter">1</span></p>
             <p>現在の親: <span id="current-parent">CPU</span></p>
             <p>現在の子: <span id="current-child">プレイヤー</span></p>
-            <button id="sound-toggle" onclick="toggleSound()">音声オフ</button>
+            <button id="toggle-123-rule" onclick="toggle123Rule()">123ルール オフ</button>
+            <button id="sound-toggle" onclick="toggleSound()">音声オン</button>
             <button id="rule-button">ルール</button>
         </div>
         
         <div id="player-side">
-            <h2>プレイヤー <span id="player-status">子</span></h2>
+            <h2>プレイヤー <span id="player-status"></span></h2>
             <div id="player-role"><img id="player-role-img" src="" alt="プレイヤーの役"></div>
             <p id="player-next-roles">次に出せる役: <span id="player-options"></span></p>
             <div id="choices">
@@ -42,7 +43,7 @@
             <p>逆に、「狐」Kiún(キューン)は親と子で揃えなければいけません。揃えられなかった場合、親の負けです。</p>
             <p>初手でKiúnを出す事はできません。</p>
             <p>同じ役を連続で出すことはできません。</p>
-            <p>123ルール: Ye→Ch’eまたはCh’e→Ngeの順で役を出すと、次のターンでFreが選べるようになります。</p>
+            <p>123ルールによる特別役Freについて: プレイヤーまたはCPUがYe → Ch’e → Ngeの順に揃えた場合、次のターンで特別役Freを選択可能になります。</p>
         </div>
     </div>
     <script src="script.js"></script>
