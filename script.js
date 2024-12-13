@@ -8,31 +8,20 @@ let isRulesVisible = false;  // ルール表示のオン/オフフラグ
 
 const roles = ['Ye', 'Ch’e', 'Nge', 'Kiún', 'Fre'];  // Freを追加
 const roleImages = {
-    CPU: { 
-        'Ye': 'images/cpu-ye.png', 
-        'Ch’e': 'images/cpu-che.png', 
-        'Nge': 'images/cpu-nge.png', 
-        'Kiún': 'images/cpu-kiun.png', 
-        'Fre': 'images/cpu-fre.png'  // Freを追加
-    },
-    Player: { 
-        'Ye': 'images/player-ye.png', 
-        'Ch’e': 'images/player-che.png', 
-        'Nge': 'images/player-nge.png', 
-        'Kiún': 'images/player-kiun.png', 
-        'Fre': 'images/player-fre.png'  // Freを追加
-    }
+    CPU: { 'Ye': 'images/cpu-ye.png', 'Ch’e': 'images/cpu-che.png', 'Nge': 'images/cpu-nge.png', 'Kiún': 'images/cpu-kiun.png', 'Fre': 'images/cpu-fre.png' },
+    Player: { 'Ye': 'images/player-ye.png', 'Ch’e': 'images/player-che.png', 'Nge': 'images/player-nge.png', 'Kiún': 'images/player-kiun.png', 'Fre': 'images/player-fre.png' }
 };
 const soundFiles = {
     Ye: 'audio/ye-sound.mp3',
     'Ch’e': 'audio/che-sound.mp3',
     Nge: 'audio/nge-sound.mp3',
     Kiún: 'audio/kiun-sound.mp3',
-    Fre: 'audio/fre-sound.mp3'  // Freの音声追加
+    Fre: 'audio/fre-sound.mp3'  // Freの音声ファイル
 };
 
-let player123Progress = [];  // プレイヤーの進行状況
-let cpu123Progress = [];     // CPUの進行状況
+let canFreBeSelected = false; // Freが選べる状態かどうか
+let lastFreTurn = -1; // 最後にFreを選んだターンを記録
+let freCooldownTurns = 2; // Freが選べるターン数（連続したターンで役を出した後）
 
 // ルール表示の切り替え
 function toggleRules() {
@@ -67,6 +56,12 @@ function updateNextOptions() {
     let cpuOptions = roles.filter(role => role !== lastParentChoice).join(', ');
     let playerOptions = roles.filter(role => role !== lastChildChoice).join(', ');
 
+    // Freが選べるターンかどうか
+    if (canFreBeSelected) {
+        cpuOptions += ', Fre';
+        playerOptions += ', Fre';
+    }
+
     document.getElementById('cpu-options').innerText = cpuOptions;
     document.getElementById('player-options').innerText = playerOptions;
 }
@@ -82,10 +77,13 @@ function endGame(message) {
     document.getElementById('choices').innerHTML = '<button onclick="location.reload()">もう一度遊ぶ</button>';
 }
 
-function validate123Progress(progress, role) {
-    return (progress.length === 0 && role === 'Ye') || 
-           (progress.length === 1 && role === 'Ch’e') || 
-           (progress.length === 2 && role === 'Fre');
+function checkFreEligibility() {
+    // 連続してYe→Ch’eまたはCh’e→Ngeの順番で役を出すと次のターンでFreが選べる
+    if ((lastParentChoice === 'Ye' && lastChildChoice === 'Ch’e') || (lastParentChoice === 'Ch’e' && lastChildChoice === 'Nge')) {
+        canFreBeSelected = true;
+    } else {
+        canFreBeSelected = false;
+    }
 }
 
 function playTurn(childChoice) {
@@ -94,62 +92,83 @@ function playTurn(childChoice) {
         return;
     }
 
-    // ①Fre選択条件
-    if (childChoice === 'Fre' && !validate123Progress(player123Progress, childChoice)) {
-        alert('123ルールの条件を満たしていないため、Freは選べません。');
+    // 初手でKiúnを出せない制約
+    if (turnCounter === 1 && childChoice === 'Kiún') {
+        alert('初手でKiúnは出せません！');
         return;
     }
 
-    player123Progress.push(childChoice);
-    if (player123Progress.length > 3) player123Progress.shift();
-
-    // ②CPUの選択条件
-    let cpuChoice = getRandomChoice(lastParentChoice);
-    if (player123Progress.length === 2 && cpu123Progress.length === 2 && cpuChoice === 'Fre') {
-        cpu123Progress.push('Fre');
-    } else if (!roles.includes(cpuChoice)) {
-        cpuChoice = getRandomChoice(lastParentChoice);
+    if (childChoice === lastChildChoice) {
+        alert('同じ役を続けて出すことはできません！');
+        return;
     }
 
-    // ③Freの選択
-    if (cpuChoice === 'Fre' && !validate123Progress(cpu123Progress, cpuChoice)) {
-        cpuChoice = getRandomChoice(lastParentChoice); // Freを選べない場合は他の役に変更
+    let parentChoice = getRandomChoice(lastParentChoice);
+    if (isParentTurn && parentChoice === lastParentChoice) {
+        parentChoice = getRandomChoice(lastParentChoice);
     }
 
-    lastParentChoice = cpuChoice;
+    // Freを出せるターンかどうか
+    if (canFreBeSelected && childChoice === 'Fre') {
+        lastFreTurn = turnCounter;
+    } else if (childChoice === 'Fre' && turnCounter !== lastFreTurn + 1) {
+        alert('現在、Freを選べるターンではありません。');
+        return;
+    }
+
+    // 現在の役を保存
+    lastParentChoice = parentChoice;
     lastChildChoice = childChoice;
 
     // 勝敗判定
     let resultMessage = '';
-    if (childChoice === 'Fre' && cpuChoice === 'Fre') {
-        resultMessage = 'Fre同士の勝負なので、親が勝利します！';
-    } else if (childChoice === 'Fre' && cpuChoice !== 'Fre') {
-        resultMessage = 'Freは親が勝利します！';
-    } else if (cpuChoice === 'Fre' && childChoice !== 'Fre') {
-        resultMessage = 'Freは親が勝利します！';
-    } else if (childChoice === 'Kiún' && cpuChoice !== 'Kiún') {
+    if (childChoice === 'Kiún' && parentChoice !== 'Kiún') {
         resultMessage = 'Kiúnが一致しなかったため、親の負け！';
-    } else if (cpuChoice === 'Kiún' && childChoice !== 'Kiún') {
+    } else if (parentChoice === 'Kiún' && childChoice !== 'Kiún') {
         resultMessage = 'Kiúnが一致しなかったため、親の負け！';
     } else if (parentChoice === childChoice && childChoice === 'Kiún') {
         resultMessage = 'Kiúnが一致したためゲームは続行されます。';
+        // ゲーム続行の場合、ターン交代せず次のターンへ
         turnCounter++;
         updateRoleImages();
         playSound(childChoice); // 役の音声を再生
         updateNextOptions();
         updateTurnInfo();
         return;
+    } else if (parentChoice === childChoice) {
+        resultMessage = '親と子が同じ役を出したため子の負け！';
     }
 
-    // ⑧FreとKiún
-    if (childChoice === 'Fre' || cpuChoice === 'Fre') {
-        resultMessage = 'FreとKiúnの勝負は、親が勝利します！';
+    // Freの勝敗
+    if (childChoice === 'Fre' && parentChoice === 'Fre') {
+        resultMessage = 'Fre同士の勝負では親が勝利します。';
+    } else if (childChoice === 'Fre' && parentChoice !== 'Fre') {
+        resultMessage = 'Freと他の役との勝負では引き分けです。ターンは続行されます。';
+    } else if (parentChoice === 'Fre' && childChoice !== 'Fre') {
+        resultMessage = 'Freと他の役との勝負では引き分けです。ターンは続行されます。';
     }
 
-    // 結果を表示
+    // 勝敗が決した場合
+    if (resultMessage) {
+        updateRoleImages();
+        playSound(childChoice); // 役の音声を再生
+        endGame(resultMessage);
+        return;
+    }
+
+    // 勝負が決まらない場合、ターン交代
+    turnCounter++;
+    isParentTurn = !isParentTurn; // 親と子を交代
+    isFirstTurn = false; // 初回ターンが終わったのでフラグを更新
+
+    // 123ルールのチェック
+    checkFreEligibility();
+
+    // UIの更新
     updateRoleImages();
     playSound(childChoice); // 役の音声を再生
-    endGame(resultMessage);
+    updateNextOptions();
+    updateTurnInfo();
 }
 
 function toggleSound() {
