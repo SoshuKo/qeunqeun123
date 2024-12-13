@@ -30,24 +30,19 @@ function toggleRules() {
     document.getElementById('rules-container').style.display = isRulesVisible ? 'block' : 'none';
 }
 
+// 初回ターンの時、CPUはKiúnを選ばない
 function getRandomChoice(exclude) {
-    let choices;
-
     if (isFirstTurn) {
-        // 初回ターンではKiúnを選ばない
-        choices = roles.filter(role => role !== exclude && role !== 'Kiún');
+        let choices = roles.filter(role => role !== exclude && role !== 'Kiún');
+        return choices[Math.floor(Math.random() * choices.length)];
     } else {
-        // 初回ターン以外では通常の選択肢から選ぶ
-        choices = roles.filter(role => role !== exclude);
+        let choices = roles.filter(role => role !== exclude);
+        // 123ルールに基づきFreを選べるターンのみ選択肢に含める
+        if (canFreBeSelected) {
+            choices.push('Fre');
+        }
+        return choices[Math.floor(Math.random() * choices.length)];
     }
-
-    // Freが選べるターンなら、選択肢にFreを追加
-    if (canFreBeSelected) {
-        choices.push('Fre');
-    }
-
-    // ランダムで選択肢を返す
-    return choices[Math.floor(Math.random() * choices.length)];
 }
 
 function playSound(role) {
