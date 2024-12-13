@@ -6,11 +6,7 @@ let isSoundOn = localStorage.getItem('isSoundOn') === 'true'; // ローカルス
 let isFirstTurn = true;      // 初回ターンの判定
 let isRulesVisible = false;  // ルール表示のオン/オフフラグ
 
-// 新たに追加される情報
-let canPlayerFre = false;    // プレイヤーがFreを選べるかどうか
-let canCpuFre = false;       // CPUがFreを選べるかどうか
-
-const roles = ['Ye', 'Ch’e', 'Nge', 'Kiún', 'Fre'];
+const roles = ['Ye', 'Ch’e', 'Nge', 'Kiún', 'Fre'];  // Freを追加
 const roleImages = {
     CPU: { 'Ye': 'images/cpu-ye.png', 'Ch’e': 'images/cpu-che.png', 'Nge': 'images/cpu-nge.png', 'Kiún': 'images/cpu-kiun.png', 'Fre': 'images/cpu-fre.png' },
     Player: { 'Ye': 'images/player-ye.png', 'Ch’e': 'images/player-che.png', 'Nge': 'images/player-nge.png', 'Kiún': 'images/player-kiun.png', 'Fre': 'images/player-fre.png' }
@@ -20,8 +16,15 @@ const soundFiles = {
     'Ch’e': 'audio/che-sound.mp3',
     Nge: 'audio/nge-sound.mp3',
     Kiún: 'audio/kiun-sound.mp3',
-    Fre: 'audio/fre-sound.mp3'
+    Fre: 'audio/fre-sound.mp3'  // Freの音声ファイル
 };
+
+let canFreBeSelected = false; // Freが選べる状態かどうか
+let lastFreTurn = -1; // 最後にFreを選んだターンを記録
+let freCooldownTurns = 2; // Freが選べるターン数（連続したターンで役を出した後）
+
+let playerLastTurnChoices = []; // プレイヤーの最後のターン選択を記録
+let cpuLastTurnChoices = []; // CPUの最後のターン選択を記録
 
 // ルール表示の切り替え
 function toggleRules() {
@@ -29,33 +32,15 @@ function toggleRules() {
     document.getElementById('rules-container').style.display = isRulesVisible ? 'block' : 'none';
 }
 
-// プレイヤーのターン終了後にFreの選択可能条件を更新
-function updateFreOptions() {
-    if ((lastChildChoice === 'Ye' && lastParentChoice === 'Ch’e') || (lastChildChoice === 'Ch’e' && lastParentChoice === 'Nge')) {
-        canPlayerFre = true;
-    } else {
-        canPlayerFre = false;
-    }
-    updateRoleImages();
-    updateNextOptions();
-}
-
-// CPUのターン終了後にFreの選択可能条件を更新
-function updateCpuFreOptions() {
-    if ((lastChildChoice === 'Ye' && lastParentChoice === 'Ch’e') || (lastChildChoice === 'Ch’e' && lastParentChoice === 'Nge')) {
-        canCpuFre = true;
-    } else {
-        canCpuFre = false;
-    }
-}
-
-// ランダムに役を選ぶ（Freの選択も考慮）
+// 初回ターンの時、CPUはKiúnを選ばない
 function getRandomChoice(exclude) {
-    let choices = roles.filter(role => role !== exclude);
-    if (canCpuFre) {
-        choices.push('Fre'); // CPUがFreを選べる場合は選択肢に追加
+    if (isFirstTurn) {
+        let choices = roles.filter(role => role !== exclude && role !== 'Kiún');
+        return choices[Math.floor(Math.random() * choices.length)];
+    } else {
+        let choices = roles.filter(role => role !== exclude);
+        return choices[Math.floor(Math.random() * choices.length)];
     }
-    return choices[Math.floor(Math.random() * choices.length)];
 }
 
 function playSound(role) {
@@ -71,18 +56,17 @@ function updateRoleImages() {
 }
 
 function updateNextOptions() {
-    let cpuOptions = roles.filter(role => role !== lastParentChoice);
-    let playerOptions = roles.filter(role => role !== lastChildChoice);
+    let cpuOptions = roles.filter(role => role !== lastParentChoice).join(', ');
+    let playerOptions = roles.filter(role => role !== lastChildChoice).join(', ');
 
-    if (canCpuFre) {
-        cpuOptions.push('Fre');
-    }
-    if (canPlayerFre) {
-        playerOptions.push('Fre');
+    // Freが選べるターンかどうか
+    if (canFreBeSelected) {
+        cpuOptions += ', Fre';
+        playerOptions += ', Fre';
     }
 
-    document.getElementById('cpu-options').innerText = cpuOptions.join(', ');
-    document.getElementById('player-options').innerText = playerOptions.join(', ');
+    document.getElementById('cpu-options').innerText = cpuOptions;
+    document.getElementById('player-options').innerText = playerOptions;
 }
 
 function updateTurnInfo() {
@@ -94,6 +78,27 @@ function updateTurnInfo() {
 function endGame(message) {
     document.getElementById('center-info').innerHTML += `<p>${message}</p>`;
     document.getElementById('choices').innerHTML = '<button onclick="location.reload()">もう一度遊ぶ</button>';
+}
+
+function checkFreEligibility() {
+    // プレイヤーとCPUのターンでFreが選べるかどうかを確認
+    if (playerLastTurnChoices.length >= 2) {
+        const playerSequence = playerLastTurnChoices.slice(-2);
+        if ((playerSequence[0] === 'Ye' && playerSequence[1] === 'Ch’e') || (playerSequence[0] === 'Ch’e' && playerSequence[1] === 'Nge')) {
+            canFreBeSelected = true;
+        } else {
+            canFreBeSelected = false;
+        }
+    }
+
+    if (cpuLastTurnChoices.length >= 2) {
+        const cpuSequence = cpuLastTurnChoices.slice(-2);
+        if ((cpuSequence[0] === 'Ye' && cpuSequence[1] === 'Ch’e') || (cpuSequence[0] === 'Ch’e' && cpuSequence[1] === 'Nge')) {
+            canFreBeSelected = true;
+        } else {
+            canFreBeSelected = false;
+        }
+    }
 }
 
 function playTurn(childChoice) {
@@ -113,14 +118,17 @@ function playTurn(childChoice) {
         return;
     }
 
-    if (childChoice === 'Fre' && !canPlayerFre) {
-        alert('現在、Freは選択できません！');
-        return;
-    }
-
     let parentChoice = getRandomChoice(lastParentChoice);
     if (isParentTurn && parentChoice === lastParentChoice) {
         parentChoice = getRandomChoice(lastParentChoice);
+    }
+
+    // Freを出せるターンかどうか
+    if (canFreBeSelected && childChoice === 'Fre') {
+        lastFreTurn = turnCounter;
+    } else if (childChoice === 'Fre' && turnCounter !== lastFreTurn + 1) {
+        alert('現在、Freを選べるターンではありません。');
+        return;
     }
 
     // 現在の役を保存
@@ -146,9 +154,13 @@ function playTurn(childChoice) {
         resultMessage = '親と子が同じ役を出したため子の負け！';
     }
 
-    // Fre同士の引き分け
-    if ((parentChoice === 'Fre' && childChoice === 'Fre')) {
-        resultMessage = 'Fre同士の引き分けです。ターンが続行されます。';
+    // Freの勝敗
+    if (childChoice === 'Fre' && parentChoice === 'Fre') {
+        resultMessage = 'Fre同士の勝負では親が勝利します。';
+    } else if (childChoice === 'Fre' && parentChoice !== 'Fre') {
+        resultMessage = 'Freと他の役との勝負では引き分けです。ターンは続行されます。';
+    } else if (parentChoice === 'Fre' && childChoice !== 'Fre') {
+        resultMessage = 'Freと他の役との勝負では引き分けです。ターンは続行されます。';
     }
 
     // 勝敗が決した場合
@@ -164,9 +176,15 @@ function playTurn(childChoice) {
     isParentTurn = !isParentTurn; // 親と子を交代
     isFirstTurn = false; // 初回ターンが終わったのでフラグを更新
 
-    // Fre選択可能か更新
-    updateFreOptions();
-    updateCpuFreOptions();
+    // 123ルールのチェック
+    checkFreEligibility();
+
+    // プレイヤーとCPUのターン選択を記録
+    if (isParentTurn) {
+        cpuLastTurnChoices.push(parentChoice);
+    } else {
+        playerLastTurnChoices.push(childChoice);
+    }
 
     // UIの更新
     updateRoleImages();
