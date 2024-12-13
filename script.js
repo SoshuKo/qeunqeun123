@@ -42,15 +42,7 @@ let cpuSequence = [];
 // ルール表示の切り替え
 function toggleRules() {
     isRulesVisible = !isRulesVisible;
-    const rulesContainer = document.getElementById('rules-container');
-    rulesContainer.style.display = isRulesVisible ? 'block' : 'none';
-}
-
-// 音声のオン/オフ切り替え
-function toggleSound() {
-    isSoundOn = !isSoundOn;
-    localStorage.setItem('isSoundOn', isSoundOn);
-    document.getElementById('sound-toggle').innerText = isSoundOn ? '音声オフ' : '音声オン';
+    document.getElementById('rules-container').style.display = isRulesVisible ? 'block' : 'none';
 }
 
 // 初回ターンの時、CPUはKiúnを選ばない
@@ -65,18 +57,16 @@ function getRandomChoice(exclude) {
     return validChoices[Math.floor(Math.random() * validChoices.length)];
 }
 
-// 音声再生
 function playSound(role) {
     if (isSoundOn) {
-        const audio = new Audio(soundFiles[role]);
+        let audio = new Audio(soundFiles[role]);
         audio.play();
     }
 }
 
-// 役の画像更新
 function updateRoleImages() {
-    document.getElementById('cpu-role-img').src = roleImages.CPU[lastParentChoice] || 'images/default-cpu.png';
-    document.getElementById('player-role-img').src = roleImages.Player[lastChildChoice] || 'images/default-player.png';
+    document.getElementById('cpu-role-img').src = roleImages.CPU[lastParentChoice] || '';
+    document.getElementById('player-role-img').src = roleImages.Player[lastChildChoice] || '';
 }
 
 function updateNextOptions() {
