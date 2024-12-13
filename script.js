@@ -35,7 +35,7 @@ function toggleRules() {
 // 初回ターンの時、CPUはKiúnを選ばない
 function getRandomChoice(exclude) {
     if (isFirstTurn) {
-        let choices = roles.filter(role => role !== exclude && role !== 'Kiún');
+        let choices = roles.filter(role => role !== exclude && role !== 'Kiún'); // 初回ターンでKiúnを選ばない
         return choices[Math.floor(Math.random() * choices.length)];
     } else {
         let choices = roles.filter(role => role !== exclude);
@@ -61,8 +61,8 @@ function updateNextOptions() {
 
     // Freが選べるターンかどうか
     if (canFreBeSelected) {
-        cpuOptions += ', Fre';
-        playerOptions += ', Fre';
+        cpuOptions += ', Fre';  // Freが選べる場合、選択肢にFreを追加
+        playerOptions += ', Fre';  // Freが選べる場合、選択肢にFreを追加
     }
 
     document.getElementById('cpu-options').innerText = cpuOptions;
@@ -85,7 +85,7 @@ function checkFreEligibility() {
     if (playerLastTurnChoices.length >= 2) {
         const playerSequence = playerLastTurnChoices.slice(-2);
         if ((playerSequence[0] === 'Ye' && playerSequence[1] === 'Ch’e') || (playerSequence[0] === 'Ch’e' && playerSequence[1] === 'Nge')) {
-            canFreBeSelected = true;
+            canFreBeSelected = true;  // プレイヤーがFreを選べる条件
         } else {
             canFreBeSelected = false;
         }
@@ -94,7 +94,7 @@ function checkFreEligibility() {
     if (cpuLastTurnChoices.length >= 2) {
         const cpuSequence = cpuLastTurnChoices.slice(-2);
         if ((cpuSequence[0] === 'Ye' && cpuSequence[1] === 'Ch’e') || (cpuSequence[0] === 'Ch’e' && cpuSequence[1] === 'Nge')) {
-            canFreBeSelected = true;
+            canFreBeSelected = true;  // CPUがFreを選べる条件
         } else {
             canFreBeSelected = false;
         }
@@ -143,7 +143,6 @@ function playTurn(childChoice) {
         resultMessage = 'Kiúnが一致しなかったため、親の負け！';
     } else if (parentChoice === childChoice && childChoice === 'Kiún') {
         resultMessage = 'Kiúnが一致したためゲームは続行されます。';
-        // ゲーム続行の場合、ターン交代せず次のターンへ
         turnCounter++;
         updateRoleImages();
         playSound(childChoice); // 役の音声を再生
