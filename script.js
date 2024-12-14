@@ -5,8 +5,10 @@ let turnCounter = 1;         // 現在のターン数
 let isSoundOn = localStorage.getItem('isSoundOn') === 'true'; // ローカルストレージから音声設定を読み込む
 let isFirstTurn = true;      // 初回ターンの判定
 let isRulesVisible = false;  // ルール表示のオン/オフフラグ
+let canSelectFre = false;    // Freを選択できるかどうか
+let previousChoices = [];    // 連続したYe→Ch’eまたはCh’e→Ngeの履歴
 
-const roles = ['Ye', 'Ch’e', 'Nge', 'Kiún', 'Fre'];  // Freを追加
+const roles = ['Ye', 'Ch’e', 'Nge', 'Kiún', 'Fre'];
 const roleImages = {
     CPU: { 'Ye': 'images/cpu-ye.png', 'Ch’e': 'images/cpu-che.png', 'Nge': 'images/cpu-nge.png', 'Kiún': 'images/cpu-kiun.png', 'Fre': 'images/cpu-fre.png' },
     Player: { 'Ye': 'images/player-ye.png', 'Ch’e': 'images/player-che.png', 'Nge': 'images/player-nge.png', 'Kiún': 'images/player-kiun.png', 'Fre': 'images/player-fre.png' }
@@ -16,15 +18,8 @@ const soundFiles = {
     'Ch’e': 'audio/che-sound.mp3',
     Nge: 'audio/nge-sound.mp3',
     Kiún: 'audio/kiun-sound.mp3',
-    Fre: 'audio/fre-sound.mp3'  // Freの音声ファイル
+    Fre: 'audio/fre-sound.mp3'
 };
-
-let canFreBeSelected = false; // Freが選べる状態かどうか
-let lastFreTurn = -1; // 最後にFreを選んだターンを記録
-let freCooldownTurns = 2; // Freが選べるターン数（連続したターンで役を出した後）
-
-let flagA = false; // Ye → Ch’e ルールに従うフラグA
-let flagB = false; // Ch’e → Nge ルールに従うフラグB
 
 // ルール表示の切り替え
 function toggleRules() {
@@ -54,8 +49,7 @@ function updateNextOptions() {
     let cpuOptions = roles.filter(role => role !== lastParentChoice).join(', ');
     let playerOptions = roles.filter(role => role !== lastChildChoice).join(', ');
 
-    // Freが選べるターンかどうか
-    if (canFreBeSelected) {
+    if (canSelectFre) {
         cpuOptions += ', Fre';
         playerOptions += ', Fre';
     }
@@ -75,16 +69,6 @@ function endGame(message) {
     document.getElementById('choices').innerHTML = '<button onclick="location.reload()">もう一度遊ぶ</button>';
 }
 
-function checkFreEligibility() {
-    // 123ルールに基づいて、Freが選べるかどうかを判断
-    if ((lastParentChoice === 'Ye' && lastChildChoice === 'Ch’e') || (lastParentChoice === 'Ch’e' && lastChildChoice === 'Nge')) {
-        canFreBeSelected = true;
-    } else {
-        canFreBeSelected = false;
-    }
-}
-
-// プレイヤーとCPUのターンの処理
 function playTurn(childChoice) {
     if (!roles.includes(childChoice)) {
         alert('無効な選択です。');
@@ -97,6 +81,14 @@ function playTurn(childChoice) {
         return;
     }
 
+    // Fre選択制限
+    if (childChoice === 'Fre') {
+        if (!canSelectFre) {
+            alert('このターンではFreを選択できません。');
+            return;
+        }
+    }
+
     if (childChoice === lastChildChoice) {
         alert('同じ役を続けて出すことはできません！');
         return;
@@ -107,37 +99,36 @@ function playTurn(childChoice) {
         parentChoice = getRandomChoice(lastParentChoice);
     }
 
-    // Freが選べるターンかどうか
-    if (canFreBeSelected && childChoice === 'Fre') {
-        lastFreTurn = turnCounter;
-    } else if (childChoice === 'Fre' && turnCounter !== lastFreTurn + 1) {
-        alert('現在、Freを選べるターンではありません。');
-        return;
-    }
-
     // 現在の役を保存
     lastParentChoice = parentChoice;
     lastChildChoice = childChoice;
 
-    // フラグチェックとFre選択の判定
-    checkFreEligibility();
-
-    // フラグAとフラグBの表示更新
-    document.getElementById('flagA').innerText = flagA ? 'true' : 'false';
-    document.getElementById('flagB').innerText = flagB ? 'true' : 'false';
+    // 123ルール
+    if (previousChoices.length === 2) {
+        if (previousChoices[0] === 'Ye' && previousChoices[1] === 'Ch’e' && childChoice === 'Nge') {
+            canSelectFre = true;
+        } else if (previousChoices[0] === 'Ch’e' && previousChoices[1] === 'Nge' && childChoice === 'Ye') {
+            canSelectFre = true;
+        } else {
+            canSelectFre = false;
+        }
+        previousChoices = [];
+    } else {
+        previousChoices.push(childChoice);
+    }
 
     // 勝敗判定
     let resultMessage = '';
-
     if (childChoice === 'Kiún' && parentChoice !== 'Kiún') {
         resultMessage = 'Kiúnが一致しなかったため、親の負け！';
     } else if (parentChoice === 'Kiún' && childChoice !== 'Kiún') {
         resultMessage = 'Kiúnが一致しなかったため、親の負け！';
     } else if (parentChoice === childChoice && childChoice === 'Kiún') {
         resultMessage = 'Kiúnが一致したためゲームは続行されます。';
+        // ゲーム続行の場合、ターン交代せず次のターンへ
         turnCounter++;
         updateRoleImages();
-        playSound(childChoice);
+        playSound(childChoice); // 役の音声を再生
         updateNextOptions();
         updateTurnInfo();
         return;
@@ -145,33 +136,10 @@ function playTurn(childChoice) {
         resultMessage = '親と子が同じ役を出したため子の負け！';
     }
 
-    // Freの勝敗
-    if (childChoice === 'Fre' && parentChoice === 'Fre') {
-        resultMessage = 'Fre同士の勝負では親が勝利します。';
-    } else if (childChoice === 'Fre' && parentChoice !== 'Fre') {
-        resultMessage = 'Freと他の役との勝負では引き分けです。ターンは続行されます。';
-        turnCounter++;
-        isParentTurn = !isParentTurn;
-        updateRoleImages();
-        playSound(childChoice);
-        updateNextOptions();
-        updateTurnInfo();
-        return;
-    } else if (parentChoice === 'Fre' && childChoice !== 'Fre') {
-        resultMessage = 'Freと他の役との勝負では引き分けです。ターンは続行されます。';
-        turnCounter++;
-        isParentTurn = !isParentTurn;
-        updateRoleImages();
-        playSound(childChoice);
-        updateNextOptions();
-        updateTurnInfo();
-        return;
-    }
-
     // 勝敗が決した場合
     if (resultMessage) {
         updateRoleImages();
-        playSound(childChoice);
+        playSound(childChoice); // 役の音声を再生
         endGame(resultMessage);
         return;
     }
@@ -179,11 +147,20 @@ function playTurn(childChoice) {
     // 勝負が決まらない場合、ターン交代
     turnCounter++;
     isParentTurn = !isParentTurn; // 親と子を交代
-    isFirstTurn = false;
+    isFirstTurn = false; // 初回ターンが終わったのでフラグを更新
 
     // UIの更新
     updateRoleImages();
-    playSound(childChoice);
+    playSound(childChoice); // 役の音声を再生
     updateNextOptions();
     updateTurnInfo();
 }
+
+function toggleSound() {
+    isSoundOn = !isSoundOn;
+    localStorage.setItem('isSoundOn', isSoundOn); // 音声設定をローカルストレージに保存
+    document.getElementById('sound-toggle').innerText = isSoundOn ? '音声オフ' : '音声オン';
+}
+
+// ルールボタンの追加
+document.getElementById('rule-button').addEventListener('click', toggleRules);
