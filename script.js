@@ -274,6 +274,7 @@ function debugSelect() {
     alert(`CPUの選択肢を「${selectedChoice}」に設定しました。`);
 }
 
+
 // ルールボタンの追加
 document.getElementById('rule-button').addEventListener('click', toggleRules);
 
@@ -282,4 +283,5 @@ document.getElementById('debug-mode-toggle').addEventListener('change', function
     document.getElementById('debug-mode-options').style.display = isDebugMode ? 'block' : 'none';
     updateDebugOptions();
 });
+
 
