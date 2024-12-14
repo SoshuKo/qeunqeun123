@@ -79,8 +79,14 @@ function endGame(message) {
 
 function checkFreEligibility() {
     // 123ルールに基づいて、Freが選べるかどうかを判断
-    flagA = lastParentChoice === 'Ye' && lastChildChoice === 'Ch’e';
-    flagB = lastParentChoice === 'Ch’e' && lastChildChoice === 'Nge';
+    if (lastParentChoice === 'Ye' && lastChildChoice === 'Ch’e') {
+        flagA = true;
+    } else if (lastParentChoice === 'Ch’e' && lastChildChoice === 'Nge') {
+        flagB = true;
+    } else {
+        flagA = false;
+        flagB = false;
+    }
     canFreBeSelected = flagA || flagB;
 }
 
