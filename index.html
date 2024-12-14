@@ -17,6 +17,11 @@
             <p>前々回の役: <span id="cpu-second-last-role"></span></p> <!-- 追加点: 「前々回の役」を表示 -->
             <p id="cpu-fre-availability" style="color: green; display: none;">CPUは次のターンでFreを選択可能です！</p> <!-- ⑪ CPUがFreを選べる場合の表示 -->
             <p id="cpu-options"></p>
+            <div id="debug-mode-options" style="display: none;">
+                <p>デバッグモード有効：CPUの次の選択肢を選べます。</p>
+                <select id="debug-choice-select"></select>
+                <button onclick="debugSelect()">選択する</button>
+            </div>
         </div>
         
         <div id="center-info">
@@ -27,6 +32,10 @@
             <p>現在の子: <span id="current-child">プレイヤー</span></p>
             <button id="sound-toggle" onclick="toggleSound()">音声オン</button>
             <button id="rule-button">ルール</button>
+            <label>
+                <input type="checkbox" id="debug-mode-toggle">
+                デバッグモード
+            </label>
         </div>
         
         <div id="player-side">
