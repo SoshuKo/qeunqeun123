@@ -163,7 +163,7 @@ function playTurn(childChoice) {
         isCPUFTurn = true;
     }
 
-    // Fターン終了後に再びFreを選ぶ条件を整える
+    // CPUFターン終了後にFreを選べる状態をリセット
     if (isCPUFTurn && childChoice === 'Fre') {
         isCPUFTurn = false;
     }
