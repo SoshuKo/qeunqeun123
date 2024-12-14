@@ -93,10 +93,6 @@ function updateTurnInfo() {
     document.getElementById('turn-counter').innerText = turnCounter;
     document.getElementById('current-parent').innerText = isParentTurn ? 'CPU (親)' : 'プレイヤー (親)';
     document.getElementById('current-child').innerText = isParentTurn ? 'プレイヤー (子)' : 'CPU (子)';
-
-    // CPUFターンとFターンの状態を表示
-    document.getElementById('cpuft-turn-status').innerText = isCPUFTurn ? '開始' : '未開始';
-    document.getElementById('ft-turn-status').innerText = isFTurn ? '開始' : '未開始';
 }
 
 function endGame(message) {
