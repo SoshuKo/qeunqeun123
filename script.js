@@ -162,12 +162,12 @@ function playTurn(childChoice) {
     if ((cpuSequence.slice(-2).join(',') === 'Ye,Ch’e' || cpuSequence.slice(-2).join(',') === 'Ch’e,Nge') && !isCPUFTurn) {
         isCPUFTurn = true;
     }
-
+    
     // CPUFターン終了の判定
     if (isCPUFTurn) {
         // CPUFターンは「Ye→Ch’e」または「Ch’e→Nge」の次に何を出しても終了
         isCPUFTurn = false; // 強制的に終了
-}
+    }
 
     // 勝敗判定
     let resultMessage = '';
