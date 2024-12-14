@@ -60,25 +60,19 @@ function getRandomChoice(exclude, includeFre = false) {
     if (lastParentChoice === 'Kiún') {
         choices = choices.filter(role => role !== 'Fre');
     }
-    if (lastParentChoice === 'Ye' && secondLastParentChoice === 'Kiún') {
+    if (lastParentChoice === 'Ye') {
         choices = choices.filter(role => role !== 'Fre');
-    }
+    }    
     if (lastParentChoice === 'Ch’e' && secondLastParentChoice === 'Kiún') {
         choices = choices.filter(role => role !== 'Fre');
     }
     if (lastParentChoice === 'Nge' && secondLastParentChoice === 'Kiún') {
         choices = choices.filter(role => role !== 'Fre');
     }
-    if (lastParentChoice === 'Ye' && secondLastParentChoice === 'Nge') {
-        choices = choices.filter(role => role !== 'Fre');
-    }
-    if (lastParentChoice === 'Ch’e' && secondLastParentChoice === 'Ye') {
-        choices = choices.filter(role => role !== 'Fre');
-    }
     if (lastParentChoice === 'Nge' && secondLastParentChoice === 'Ye') {
         choices = choices.filter(role => role !== 'Fre');
     }
-    if (lastParentChoice === 'Nge' && secondLastParentChoice === 'Ch’e') {
+    if (lastParentChoice === 'Ch’e' && secondLastParentChoice === 'Nge') {
         choices = choices.filter(role => role !== 'Fre');
     }
 
