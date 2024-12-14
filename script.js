@@ -1,5 +1,7 @@
 let lastParentChoice = null; // CPUの前回の役
 let lastChildChoice = null;  // プレイヤーの前回の役
+let secondLastParentChoice = null; // CPUの前々回の役
+let secondLastChildChoice = null;  // プレイヤーの前々回の役
 let isParentTurn = true;     // 現在のターンが親のターンかどうか
 let turnCounter = 1;         // 現在のターン数
 let isSoundOn = localStorage.getItem('isSoundOn') === 'true'; // ローカルストレージから音声設定を読み込む
@@ -71,7 +73,9 @@ function updateRoleImages() {
 // 前回の役を更新する関数
 function updateLastRoles() {
     document.getElementById('cpu-last-role').innerText = lastParentChoice || 'なし';
+    document.getElementById('cpu-second-last-role').innerText = secondLastParentChoice || 'なし'; // 追加: 前々回の役を表示
     document.getElementById('player-last-role').innerText = lastChildChoice || 'なし';
+    document.getElementById('player-second-last-role').innerText = secondLastChildChoice || 'なし'; // 追加: 前々回の役を表示
 }
 
 function updateNextOptions() {
@@ -119,10 +123,12 @@ function playTurn(childChoice) {
     }
 
     let parentChoice = getRandomChoice(lastParentChoice, cpuCanChooseFre); // ④ CPUがFreを選べるか確認
-
+    
     // 現在の役を保存
-    lastParentChoice = parentChoice;
-    lastChildChoice = childChoice;
+    secondLastParentChoice = lastParentChoice; // 前々回の役を更新
+    secondLastChildChoice = lastChildChoice;   // 前々回の役を更新
+    lastParentChoice = parentChoice;           // 前回の役を更新
+    lastChildChoice = childChoice;             // 前回の役を更新
 
     // 前回の役を更新
     updateLastRoles();
