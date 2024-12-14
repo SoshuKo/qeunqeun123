@@ -77,29 +77,10 @@ function endGame(message) {
 
 function checkFreEligibility() {
     // 123ルールに基づいて、Freが選べるかどうかを判断
-    if (flagA && lastParentChoice === 'Ch’e') {
-        canFreBeSelected = true;
-    } else if (flagB && lastParentChoice === 'Nge') {
+    if ((lastParentChoice === 'Ye' && lastChildChoice === 'Ch’e') || (lastParentChoice === 'Ch’e' && lastChildChoice === 'Nge')) {
         canFreBeSelected = true;
     } else {
         canFreBeSelected = false;
-    }
-}
-
-// 123ルールに従ってフラグを管理
-function checkFlagsAndSetFre() {
-    // Ye→Ch’e の流れでフラグAが立つ
-    if (lastParentChoice === 'Ye' && lastChildChoice === 'Ch’e') {
-        flagA = true;
-    } else if (lastParentChoice !== 'Ch’e') {
-        flagA = false; // Ch’e以外を選ぶとフラグAは消失
-    }
-
-    // Ch’e→Nge の流れでフラグBが立つ
-    if (lastParentChoice === 'Ch’e' && lastChildChoice === 'Nge') {
-        flagB = true;
-    } else if (lastParentChoice !== 'Nge') {
-        flagB = false; // Nge以外を選ぶとフラグBは消失
     }
 }
 
@@ -139,7 +120,6 @@ function playTurn(childChoice) {
     lastChildChoice = childChoice;
 
     // フラグチェックとFre選択の判定
-    checkFlagsAndSetFre();
     checkFreEligibility();
 
     // 勝敗判定
