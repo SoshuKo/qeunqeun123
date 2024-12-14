@@ -145,8 +145,22 @@ function playTurn(childChoice) {
         resultMessage = 'Freと他の役の勝負で引き分け！ターン続行！'; // ⑨
     } else if (childChoice === parentChoice && childChoice === 'Kiún') {
         resultMessage = 'Kiúnが一致したためゲームは続行されます。';
+        // ゲーム続行の場合、ターン交代せず次のターンへ
+        turnCounter++;
+        updateRoleImages();
+        playSound(childChoice); // 役の音声を再生
+        updateNextOptions();
+        updateTurnInfo();
+        return;
     } else if (parentChoice === childChoice) {
         resultMessage = '親と子が同じ役を出したため子の負け！';
+    }
+
+    // 新しい勝敗判定の追加
+    if (childChoice === 'Kiún' && parentChoice !== 'Kiún') {
+        resultMessage = 'Kiúnが一致しなかったため、親の負け！';
+    } else if (parentChoice === 'Kiún' && childChoice !== 'Kiún') {
+        resultMessage = 'Kiúnが一致しなかったため、親の負け！';
     }
 
     // 勝敗が決した場合
