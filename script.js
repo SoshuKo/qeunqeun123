@@ -112,7 +112,7 @@ function playTurn(childChoice) {
     }
 
     // 初手でKiúnを出せない制約
-    if (turnCounter === 1 && childChoice === 'Kiún') {
+    if (turnCounter === 0 && childChoice === 'Kiún') {
         alert('初手でKiúnは出せません！');
         return;
     }
