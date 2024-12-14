@@ -7,7 +7,6 @@ let turnCounter = 0;         // 現在のターン数
 let isSoundOn = localStorage.getItem('isSoundOn') === 'true'; // ローカルストレージから音声設定を読み込む
 let isFirstTurn = true;      // 初回ターンの判定
 let isRulesVisible = false;  // ルール表示のオン/オフフラグ
-let isDebugMode = false; // デバッグモードフラグ
 
 const roles = ['Ye', 'Ch’e', 'Nge', 'Kiún', 'Fre']; // ① Freを追加
 const roleImages = {
@@ -90,32 +89,6 @@ function updateNextOptions() {
     }
 }
 
-// デバッグ用選択肢を更新
-function updateDebugOptions() {
-    if (isDebugMode) {
-        let cpuChoices = roles.filter(role => role !== lastParentChoice);
-
-        // 初手でKiúnを選べない条件
-        if (isFirstTurn) {
-            cpuChoices = cpuChoices.filter(role => role !== 'Kiún');
-        }
-
-        // Fre選択の条件
-        if (!cpuCanChooseFre) {
-            cpuChoices = cpuChoices.filter(role => role !== 'Fre');
-        }
-
-        const debugSelect = document.getElementById('debug-choice-select');
-        debugSelect.innerHTML = ''; // 初期化
-        cpuChoices.forEach(choice => {
-            let option = document.createElement('option');
-            option.value = choice;
-            option.textContent = choice;
-            debugSelect.appendChild(option);
-        });
-    }
-}
-
 function updateTurnInfo() {
     document.getElementById('turn-counter').innerText = turnCounter;
     document.getElementById('current-parent').innerText = isParentTurn ? 'CPU (親)' : 'プレイヤー (親)';
@@ -123,18 +96,11 @@ function updateTurnInfo() {
 }
 
 function endGame(message) {
-    document.getElementById('center-info').innerHTML += `<p>${message}</p>`;
+    document.getElementById('center-info').innerHTML += <p>${message}</p>;
     document.getElementById('choices').innerHTML = '<button onclick="location.reload()">もう一度遊ぶ</button>';
 }
 
 function playTurn(childChoice) {
-    if (isDebugMode) {
-        const debugChoice = document.getElementById('debug-choice-select').value;
-        if (debugChoice) {
-            lastParentChoice = debugChoice; // CPUの選択肢を強制設定
-        }
-    }
-    
     if (!roles.includes(childChoice)) {
         alert('無効な選択です。');
         return;
@@ -266,22 +232,5 @@ function toggleSound() {
     document.getElementById('sound-toggle').innerText = isSoundOn ? '音声オフ' : '音声オン';
 }
 
-// デバッグ選択処理
-function debugSelect() {
-    if (!isDebugMode) return;
-    const selectedChoice = document.getElementById('debug-choice-select').value;
-    lastParentChoice = selectedChoice; // CPUの選択を強制設定
-    alert(`CPUの選択肢を「${selectedChoice}」に設定しました。`);
-}
-
-
 // ルールボタンの追加
 document.getElementById('rule-button').addEventListener('click', toggleRules);
-
-document.getElementById('debug-mode-toggle').addEventListener('change', function () {
-    isDebugMode = this.checked;
-    document.getElementById('debug-mode-options').style.display = isDebugMode ? 'block' : 'none';
-    updateDebugOptions();
-});
-
-
