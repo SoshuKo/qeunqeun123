@@ -68,6 +68,12 @@ function updateRoleImages() {
     document.getElementById('player-role-img').src = roleImages.Player[lastChildChoice] || '';
 }
 
+// 前回の役を更新する関数
+function updateLastRoles() {
+    document.getElementById('cpu-last-role').innerText = lastParentChoice || 'なし';
+    document.getElementById('player-last-role').innerText = lastChildChoice || 'なし';
+}
+
 function updateNextOptions() {
     let cpuOptions = roles.filter(role => role !== lastParentChoice).join(', ');
     let playerOptions = roles.filter(role => role !== lastChildChoice).join(', ');
@@ -117,6 +123,9 @@ function playTurn(childChoice) {
     // 現在の役を保存
     lastParentChoice = parentChoice;
     lastChildChoice = childChoice;
+
+    // 前回の役を更新
+    updateLastRoles();
 
     // 選択履歴を更新 (③, ④)
     playerSequence.push(childChoice);
