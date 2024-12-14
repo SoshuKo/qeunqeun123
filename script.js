@@ -163,10 +163,11 @@ function playTurn(childChoice) {
         isCPUFTurn = true;
     }
 
-    // CPUFターン終了後にFreを選べる状態をリセット
-    if (isCPUFTurn && childChoice === 'Fre') {
-        isCPUFTurn = false;
-    }
+    // CPUFターン終了の判定
+    if (isCPUFTurn) {
+        // CPUFターンは「Ye→Ch’e」または「Ch’e→Nge」の次に何を出しても終了
+        isCPUFTurn = false; // 強制的に終了
+}
 
     // 勝敗判定
     let resultMessage = '';
