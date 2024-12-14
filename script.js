@@ -122,6 +122,10 @@ function playTurn(childChoice) {
     // フラグチェックとFre選択の判定
     checkFreEligibility();
 
+    // フラグAとフラグBの表示更新
+    document.getElementById('flagA').innerText = flagA ? 'true' : 'false';
+    document.getElementById('flagB').innerText = flagB ? 'true' : 'false';
+
     // 勝敗判定
     let resultMessage = '';
 
@@ -183,12 +187,3 @@ function playTurn(childChoice) {
     updateNextOptions();
     updateTurnInfo();
 }
-
-function toggleSound() {
-    isSoundOn = !isSoundOn;
-    localStorage.setItem('isSoundOn', isSoundOn); // 音声設定をローカルストレージに保存
-    document.getElementById('sound-toggle').innerText = isSoundOn ? '音声オフ' : '音声オン';
-}
-
-// ルールボタンの追加
-document.getElementById('rule-button').addEventListener('click', toggleRules);
