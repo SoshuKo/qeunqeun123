@@ -18,8 +18,9 @@
             <p id="cpu-fre-availability" style="color: green; display: none;">CPUは次のターンでFreを選択可能です！</p> <!-- ⑪ CPUがFreを選べる場合の表示 -->
             <p id="cpu-options"></p>
             <div id="debug-mode-options" style="display: none;">
-                <label for="debug-choice-select">CPUの次の選択肢:</label>
+                <p>デバッグモード有効：CPUの次の選択肢を選べます。</p>
                 <select id="debug-choice-select"></select>
+                <button onclick="debugSelect()">選択する</button>
             </div>
         </div>
         
