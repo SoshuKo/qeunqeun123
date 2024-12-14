@@ -36,6 +36,7 @@ let cpuSequence = [];    // ④ CPUの選択履歴
 let playerCanChooseFre = false; // ③ プレイヤーがFreを選べるかどうか
 let cpuCanChooseFre = false;    // ④ CPUがFreを選べるかどうか
 let isFTurn = false; // Fターンの判定フラグ
+let isCPUFTurn = false; // CPUFターンの判定フラグ
 
 // ルール表示の切り替え
 function toggleRules() {
@@ -140,6 +141,16 @@ function playTurn(childChoice) {
     } else if (isFTurn && childChoice !== 'Fre') {
         isFTurn = false;
         playerCanChooseFre = false;
+    }
+
+    // CPUFターンの判定
+    if ((cpuSequence.slice(-2).join(',') === 'Ye,Ch’e' || cpuSequence.slice(-2).join(',') === 'Ch’e,Nge') && !isCPUFTurn) {
+        isCPUFTurn = true;
+    }
+
+    // Fターン終了後に再びFreを選ぶ条件を整える
+    if (isCPUFTurn && childChoice === 'Fre') {
+        isCPUFTurn = false;
     }
 
     // 勝敗判定
