@@ -190,6 +190,7 @@ function playTurn(childChoice) {
         resultMessage = 'Kiúnが一致したためゲームは続行されます。';
         // ゲーム続行の場合、ターン交代せず次のターンへ
         turnCounter++;
+        isParentTurn = !isParentTurn; // 親と子を交代
         updateRoleImages();
         playSound(childChoice); // 役の音声を再生
         updateNextOptions();
