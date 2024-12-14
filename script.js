@@ -158,15 +158,14 @@ function playTurn(childChoice) {
         playerCanChooseFre = false;
     }
 
-    // CPUFターンの判定
+    // CPUFターン終了の判定
     if ((cpuSequence.slice(-2).join(',') === 'Ye,Ch’e' || cpuSequence.slice(-2).join(',') === 'Ch’e,Nge') && !isCPUFTurn) {
         isCPUFTurn = true;
     }
     
-    // CPUFターン終了の判定
-    if (isCPUFTurn) {
-        // CPUFターンは「Ye→Ch’e」または「Ch’e→Nge」の次に何を出しても終了
-        isCPUFTurn = false; // 強制的に終了
+    // CPUFターン終了の判定を追加
+    if (isCPUFTurn && (parentChoice === 'Fre' || ['Ye', 'Ch’e', 'Nge', 'Kiún'].includes(parentChoice))) {
+        isCPUFTurn = false; // FreまたはYe, Ch’e, Nge, Kiúnが選ばれたらCPUFTを終了
     }
 
     // 勝敗判定
