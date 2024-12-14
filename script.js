@@ -55,6 +55,33 @@ function getRandomChoice(exclude, includeFre = false) {
     if (isFirstTurn) {
         choices = choices.filter(role => role !== 'Kiún');
     }
+
+    // CPUの選択時にFreを選ばない条件を追加
+    if (lastParentChoice === 'Kiún') {
+        choices = choices.filter(role => role !== 'Fre');
+    }
+    if (lastParentChoice === 'Ye' && secondLastParentChoice === 'Kiún') {
+        choices = choices.filter(role => role !== 'Fre');
+    }
+    if (lastParentChoice === 'Ch’e' && secondLastParentChoice === 'Kiún') {
+        choices = choices.filter(role => role !== 'Fre');
+    }
+    if (lastParentChoice === 'Nge' && secondLastParentChoice === 'Kiún') {
+        choices = choices.filter(role => role !== 'Fre');
+    }
+    if (lastParentChoice === 'Ye' && secondLastParentChoice === 'Nge') {
+        choices = choices.filter(role => role !== 'Fre');
+    }
+    if (lastParentChoice === 'Ch’e' && secondLastParentChoice === 'Ye') {
+        choices = choices.filter(role => role !== 'Fre');
+    }
+    if (lastParentChoice === 'Nge' && secondLastParentChoice === 'Ye') {
+        choices = choices.filter(role => role !== 'Fre');
+    }
+    if (lastParentChoice === 'Nge' && secondLastParentChoice === 'Ch’e') {
+        choices = choices.filter(role => role !== 'Fre');
+    }
+
     return choices[Math.floor(Math.random() * choices.length)];
 }
 
