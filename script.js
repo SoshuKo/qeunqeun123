@@ -186,16 +186,7 @@ function playTurn(childChoice) {
         updateNextOptions();
         updateTurnInfo();
         return;
-    } else if (childChoice === parentChoice && childChoice === 'Kiún') {
-        resultMessage = 'Kiúnが一致したためゲームは続行されます。';
-        // ゲーム続行の場合、ターン交代せず次のターンへ
-        turnCounter++;
-        updateRoleImages();
-        playSound(childChoice); // 役の音声を再生
-        updateNextOptions();
-        updateTurnInfo();
-        return;
-    } else if (parentChoice === childChoice) {
+    } else if (childChoice === parentChoice) {
         resultMessage = '親と子が同じ役を出したため子の負け！';
     }
 
