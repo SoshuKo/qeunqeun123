@@ -26,7 +26,6 @@ let canFreBeSelected = false; // Freが選べる状態かどうか
 // ルール表示の切り替え
 function toggleRules() {
     isRulesVisible = !isRulesVisible;
-    // ルールを表示または非表示にする
     document.getElementById('rules-container').style.display = isRulesVisible ? 'block' : 'none';
 }
 
@@ -78,18 +77,23 @@ function endGame(message) {
     document.getElementById('choices').innerHTML = '<button onclick="location.reload()">もう一度遊ぶ</button>';
 }
 
+// フラグAとBの状態を管理し、Freが選べるターンか確認する
 function checkFreEligibility() {
-    // 連続してYe→Ch’eまたはCh’e→Ngeの順番で役を出すと次のターンでFreが選べる
-    if ((lastParentChoice === 'Ye' && lastChildChoice === 'Ch’e')) {
+    if (lastParentChoice === 'Ye' && lastChildChoice === 'Ch’e') {
         flagA = true;
-    } else if ((lastParentChoice === 'Ch’e' && lastChildChoice === 'Nge')) {
+    } else if (lastParentChoice === 'Ch’e' && lastChildChoice === 'Nge') {
         flagB = true;
     } else {
         flagA = false;
         flagB = false;
     }
 
-    canFreBeSelected = flagA || flagB;
+    // フラグAまたはフラグBが立っている場合、Freが選べる
+    if (flagA || flagB) {
+        canFreBeSelected = true;
+    } else {
+        canFreBeSelected = false;
+    }
 }
 
 function playTurn(childChoice) {
@@ -135,7 +139,6 @@ function playTurn(childChoice) {
         resultMessage = 'Kiúnが一致しなかったため、親の負け！';
     } else if (parentChoice === childChoice && childChoice === 'Kiún') {
         resultMessage = 'Kiúnが一致したためゲームは続行されます。';
-        // ゲーム続行の場合、ターン交代せず次のターンへ
         turnCounter++;
         updateRoleImages();
         playSound(childChoice); // 役の音声を再生
@@ -151,21 +154,19 @@ function playTurn(childChoice) {
         resultMessage = 'Fre同士の勝負では親が勝利します。';
     } else if (childChoice === 'Fre' && parentChoice !== 'Fre') {
         resultMessage = 'Freと他の役との勝負では引き分けです。ターンは続行されます。';
-        // ゲーム終了せずターン続行
         turnCounter++;
-        isParentTurn = !isParentTurn; // 親と子を交代
+        isParentTurn = !isParentTurn;
         updateRoleImages();
-        playSound(childChoice); // 役の音声を再生
+        playSound(childChoice);
         updateNextOptions();
         updateTurnInfo();
         return;
     } else if (parentChoice === 'Fre' && childChoice !== 'Fre') {
         resultMessage = 'Freと他の役との勝負では引き分けです。ターンは続行されます。';
-        // ゲーム終了せずターン続行
         turnCounter++;
-        isParentTurn = !isParentTurn; // 親と子を交代
+        isParentTurn = !isParentTurn;
         updateRoleImages();
-        playSound(childChoice); // 役の音声を再生
+        playSound(childChoice);
         updateNextOptions();
         updateTurnInfo();
         return;
@@ -174,7 +175,7 @@ function playTurn(childChoice) {
     // 勝敗が決した場合
     if (resultMessage) {
         updateRoleImages();
-        playSound(childChoice); // 役の音声を再生
+        playSound(childChoice);
         endGame(resultMessage);
         return;
     }
@@ -202,3 +203,4 @@ function toggleSound() {
 
 // ルールボタンの追加
 document.getElementById('rule-button').addEventListener('click', toggleRules);
+
