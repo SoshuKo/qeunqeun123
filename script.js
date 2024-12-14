@@ -3,7 +3,7 @@ let lastChildChoice = null;  // プレイヤーの前回の役
 let secondLastParentChoice = null; // CPUの前々回の役
 let secondLastChildChoice = null;  // プレイヤーの前々回の役
 let isParentTurn = true;     // 現在のターンが親のターンかどうか
-let turnCounter = 1;         // 現在のターン数
+let turnCounter = 0;         // 現在のターン数
 let isSoundOn = localStorage.getItem('isSoundOn') === 'true'; // ローカルストレージから音声設定を読み込む
 let isFirstTurn = true;      // 初回ターンの判定
 let isRulesVisible = false;  // ルール表示のオン/オフフラグ
