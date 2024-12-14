@@ -14,6 +14,7 @@
                 <img id="cpu-role-img" src="images/default-cpu.png" alt="CPUの役">
             </div>
             <p>前回の役: <span id="cpu-last-role"></span></p> <!-- 変更点: 「前回の役」を表示 -->
+            <p>前々回の役: <span id="cpu-second-last-role"></span></p> <!-- 追加点: 「前々回の役」を表示 -->
             <p id="cpu-fre-availability" style="color: green; display: none;">CPUは次のターンでFreを選択可能です！</p> <!-- ⑪ CPUがFreを選べる場合の表示 -->
         </div>
         
@@ -33,6 +34,7 @@
                 <img id="player-role-img" src="images/default-player.png" alt="プレイヤーの役">
             </div>
             <p>前回の役: <span id="player-last-role"></span></p> <!-- 変更点: 「前回の役」を表示 -->
+            <p>前々回の役: <span id="player-second-last-role"></span></p> <!-- 追加点: 「前々回の役」を表示 -->
             <div id="choices">
                 <button onclick="playTurn('Ye')">Ye</button>
                 <button onclick="playTurn('Ch’e')">Ch’e</button>
