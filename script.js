@@ -144,10 +144,8 @@ function playTurn(childChoice) {
 
     // 勝敗判定
     let resultMessage = '';
-    if (childChoice === 'Fre' && parentChoice === 'Kiún') {
-        resultMessage = 'FreとKiúnの勝負で親の勝利！'; // ⑦
-    } else if (childChoice === 'Kiún' && parentChoice === 'Fre') {
-        resultMessage = 'KiúnとFreの勝負で親の勝利！'; // ⑦
+    if ((childChoice === 'Fre' && parentChoice === 'Kiún') || (childChoice === 'Kiún' && parentChoice === 'Fre')) {
+        resultMessage = 'FreとKiúnの勝負で親の勝利！'; // ⑦ 親がFreとKiúnの勝負で勝利
     } else if (childChoice === 'Fre' && parentChoice === 'Fre') {
         resultMessage = 'Fre同士の勝負で親の勝利！'; // ⑧
     } else if (['Ye', 'Ch’e', 'Nge'].includes(childChoice) && parentChoice === 'Fre') {
@@ -208,4 +206,3 @@ function toggleSound() {
 
 // ルールボタンの追加
 document.getElementById('rule-button').addEventListener('click', toggleRules);
-
