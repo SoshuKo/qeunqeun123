@@ -164,9 +164,20 @@ function playTurn(childChoice) {
     }
     
     // CPUFターン終了の判定を追加
-    if (isCPUFTurn && (parentChoice === 'Fre' || ['Ye', 'Ch’e', 'Nge', 'Kiún'].includes(parentChoice))) {
-        isCPUFTurn = false; // FreまたはYe, Ch’e, Nge, Kiúnが選ばれたらCPUFTを終了
+    if (isCPUFTurn) {
+        // CPUがYe→Ch’e または Ch’e→Ngeの次に何を選んでもそのターン限りでCPUFTを終了
+        if (['Ye', 'Ch’e', 'Nge', 'Kiún'].includes(parentChoice)) {
+            isCPUFTurn = false; // 次にYe, Ch’e, Nge, Kiúnが選ばれたらCPUFTを終了
+        }
     }
+    
+    // さらにターン終了時にリセットするロジック
+    if (isParentTurn && turnCounter > 0) {
+        // CPUターン終了時にフラグをリセット
+        if (isCPUFTurn) {
+            isCPUFTurn = false;
+        }
+}
 
     // 勝敗判定
     let resultMessage = '';
