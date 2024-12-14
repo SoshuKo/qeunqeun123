@@ -96,7 +96,7 @@ function updateTurnInfo() {
 }
 
 function endGame(message) {
-    document.getElementById('center-info').innerHTML += <p>${message}</p>;
+    document.getElementById('center-info').innerHTML += `<p>${message}</p>`;
     document.getElementById('choices').innerHTML = '<button onclick="location.reload()">もう一度遊ぶ</button>';
 }
 
