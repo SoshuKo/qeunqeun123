@@ -55,12 +55,6 @@ function getRandomChoice(exclude, includeFre = false) {
     if (isFirstTurn) {
         choices = choices.filter(role => role !== 'Kiún');
     }
-
-    // 追加部分: CPUが親でCPUFターン中、Kiúnを選ばず、相手がFターン中でない場合、9/10の確率でFreを選ぶ
-    if (isParentTurn && !isFTurn && !isCPUFTurn && lastParentChoice !== 'Kiún' && Math.random() < 0.9) {
-        return 'Fre'; // 9/10の確率でFreを選ぶ
-    }
-
     return choices[Math.floor(Math.random() * choices.length)];
 }
 
@@ -102,7 +96,7 @@ function updateTurnInfo() {
 }
 
 function endGame(message) {
-    document.getElementById('center-info').innerHTML += `<p>${message}</p>`;
+    document.getElementById('center-info').innerHTML += <p>${message}</p>;
     document.getElementById('choices').innerHTML = '<button onclick="location.reload()">もう一度遊ぶ</button>';
 }
 
