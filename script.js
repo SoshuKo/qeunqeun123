@@ -223,3 +223,4 @@ function toggleSound() {
 
 // ルールボタンの追加
 document.getElementById('rule-button').addEventListener('click', toggleRules);
+
