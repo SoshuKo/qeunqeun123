@@ -94,8 +94,15 @@ function updateNextOptions() {
 function updateDebugOptions() {
     if (isDebugMode) {
         let cpuChoices = roles.filter(role => role !== lastParentChoice);
-        if (cpuCanChooseFre) {
-            cpuChoices.push('Fre'); // Freを選べる場合に追加
+
+        // 初手でKiúnを選べない条件
+        if (isFirstTurn) {
+            cpuChoices = cpuChoices.filter(role => role !== 'Kiún');
+        }
+
+        // Fre選択の条件
+        if (!cpuCanChooseFre) {
+            cpuChoices = cpuChoices.filter(role => role !== 'Fre');
         }
 
         const debugSelect = document.getElementById('debug-choice-select');
@@ -121,6 +128,13 @@ function endGame(message) {
 }
 
 function playTurn(childChoice) {
+    if (isDebugMode) {
+        const debugChoice = document.getElementById('debug-choice-select').value;
+        if (debugChoice) {
+            lastParentChoice = debugChoice; // CPUの選択肢を強制設定
+        }
+    }
+    
     if (!roles.includes(childChoice)) {
         alert('無効な選択です。');
         return;
