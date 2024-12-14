@@ -19,9 +19,9 @@ const soundFiles = {
     Fre: 'audio/fre-sound.mp3'  // Freの音声ファイル
 };
 
+let flagA = false; // Ye→Ch’e の順番のフラグ
+let flagB = false; // Ch’e→Nge の順番のフラグ
 let canFreBeSelected = false; // Freが選べる状態かどうか
-let lastFreTurn = -1; // 最後にFreを選んだターンを記録
-let freCooldownTurns = 2; // Freが選べるターン数（連続したターンで役を出した後）
 
 // ルール表示の切り替え
 function toggleRules() {
@@ -37,10 +37,6 @@ function getRandomChoice(exclude) {
         return choices[Math.floor(Math.random() * choices.length)];
     } else {
         let choices = roles.filter(role => role !== exclude);
-        // Freが選べる状態ならFreも選択肢に含める
-        if (canFreBeSelected) {
-            choices.push('Fre');
-        }
         return choices[Math.floor(Math.random() * choices.length)];
     }
 }
@@ -78,17 +74,22 @@ function updateTurnInfo() {
 }
 
 function endGame(message) {
-    document.getElementById('center-info').innerHTML += <p>${message}</p>;
+    document.getElementById('center-info').innerHTML += `<p>${message}</p>`;
     document.getElementById('choices').innerHTML = '<button onclick="location.reload()">もう一度遊ぶ</button>';
 }
 
 function checkFreEligibility() {
     // 連続してYe→Ch’eまたはCh’e→Ngeの順番で役を出すと次のターンでFreが選べる
-    if ((lastParentChoice === 'Ye' && lastChildChoice === 'Ch’e') || (lastParentChoice === 'Ch’e' && lastChildChoice === 'Nge')) {
-        canFreBeSelected = true;
+    if ((lastParentChoice === 'Ye' && lastChildChoice === 'Ch’e')) {
+        flagA = true;
+    } else if ((lastParentChoice === 'Ch’e' && lastChildChoice === 'Nge')) {
+        flagB = true;
     } else {
-        canFreBeSelected = false;
+        flagA = false;
+        flagB = false;
     }
+
+    canFreBeSelected = flagA || flagB;
 }
 
 function playTurn(childChoice) {
