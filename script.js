@@ -35,6 +35,7 @@ let playerSequence = []; // ③ プレイヤーの選択履歴
 let cpuSequence = [];    // ④ CPUの選択履歴
 let playerCanChooseFre = false; // ③ プレイヤーがFreを選べるかどうか
 let cpuCanChooseFre = false;    // ④ CPUがFreを選べるかどうか
+let isFTurn = false; // Fターンの判定フラグ
 
 // ルール表示の切り替え
 function toggleRules() {
@@ -133,6 +134,14 @@ function playTurn(childChoice) {
         cpuCanChooseFre = false;
     }
 
+    // Fターン判定: Ye→Ch’e または Ch’e→Ngeの順で出された場合
+    if (playerSequence.slice(-2).join(',') === 'Ye,Ch’e' || playerSequence.slice(-2).join(',') === 'Ch’e,Nge') {
+        isFTurn = true;
+    } else if (isFTurn && childChoice !== 'Fre') {
+        isFTurn = false;
+        playerCanChooseFre = false;
+    }
+
     // 勝敗判定
     let resultMessage = '';
     if (childChoice === 'Fre' && parentChoice === 'Kiún') {
@@ -199,3 +208,4 @@ function toggleSound() {
 
 // ルールボタンの追加
 document.getElementById('rule-button').addEventListener('click', toggleRules);
+
