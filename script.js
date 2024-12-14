@@ -143,6 +143,14 @@ function playTurn(childChoice) {
         resultMessage = 'Fre同士の勝負で親の勝利！'; // ⑧
     } else if (['Ye', 'Ch’e', 'Nge'].includes(childChoice) && parentChoice === 'Fre') {
         resultMessage = 'Freと他の役の勝負で引き分け！ターン続行！'; // ⑨
+        // 引き分けの処理: 親と子を交代して次のターンへ進む
+        turnCounter++;
+        isParentTurn = !isParentTurn; // 親と子を交代
+        updateRoleImages();
+        playSound(childChoice); // 役の音声を再生
+        updateNextOptions();
+        updateTurnInfo();
+        return;
     } else if (childChoice === parentChoice && childChoice === 'Kiún') {
         resultMessage = 'Kiúnが一致したためゲームは続行されます。';
         // ゲーム続行の場合、ターン交代せず次のターンへ
